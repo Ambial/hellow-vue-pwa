@@ -1,0 +1,157 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Material Design base styles */
+@layer base {
+  html {
+    @apply transition-colors duration-300;
+  }
+  
+  body {
+    @apply min-h-screen bg-gray-50 text-gray-900;
+  }
+  
+  .dark body {
+    @apply bg-gray-900 text-gray-100;
+  }
+}
+
+/* Material Design component styles */
+@layer components {
+  .btn-primary {
+    @apply bg-blue-600 text-white px-4 py-2 rounded-md 
+           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50
+           transition-colors duration-200 shadow-md;
+  }
+  
+  .btn-primary:hover {
+    @apply bg-blue-700;
+  }
+
+  .btn-secondary {
+    @apply bg-yellow-500 text-white px-4 py-2 rounded-md 
+           focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50
+           transition-colors duration-200 shadow-md;
+  }
+  
+  .btn-secondary:hover {
+    @apply bg-yellow-600;
+  }
+
+  .btn-icon {
+    @apply p-2 rounded-full transition-colors duration-200 focus:outline-none;
+  }
+  
+  .btn-icon:hover {
+    @apply bg-gray-100;
+  }
+  
+  .dark .btn-icon:hover {
+    @apply bg-gray-700;
+  }
+
+  .card {
+    @apply bg-white rounded-lg shadow-md p-4 transition-shadow duration-200;
+  }
+  
+  .card:hover {
+    @apply shadow-lg;
+  }
+  
+  .dark .card {
+    @apply bg-gray-800;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900
+           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+           transition-colors duration-200;
+  }
+  
+  .dark .input-field {
+    @apply bg-gray-700 border-gray-600 text-gray-100;
+  }
+
+  .todo-item {
+    @apply flex items-center p-3 border-b border-gray-200 transition-colors duration-200;
+  }
+  
+  .todo-item:hover {
+    @apply bg-gray-50;
+  }
+  
+  .dark .todo-item {
+    @apply border-gray-700;
+  }
+  
+  .dark .todo-item:hover {
+    @apply bg-gray-700;
+  }
+
+  .checkbox {
+    @apply h-5 w-5 rounded border-2 border-gray-300 text-blue-600
+           focus:ring-blue-500 transition-colors duration-200;
+  }
+  
+  .dark .checkbox {
+    @apply border-gray-600 text-blue-400;
+  }
+
+  .nav-link {
+    @apply px-3 py-2 rounded-md text-gray-700
+           transition-colors duration-200;
+  }
+  
+  .nav-link:hover {
+    @apply bg-gray-100 text-blue-600;
+  }
+  
+  .dark .nav-link {
+    @apply text-gray-300;
+  }
+  
+  .dark .nav-link:hover {
+    @apply bg-gray-700;
+  }
+
+  .nav-link-active {
+    @apply bg-blue-50 text-blue-600 font-medium;
+  }
+  
+  .dark .nav-link-active {
+    @apply bg-gray-700 text-blue-400;
+  }
+}
+
+/* Custom animations */
+@layer utilities {
+  .fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  .slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { 
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to { 
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Fix for last todo item border */
+  .todo-item:last-child {
+    border-bottom: none;
+  }
+}
