@@ -58,11 +58,15 @@ module.exports = (env, argv) => ({
       template: path.resolve(__dirname, 'static', 'index.html'),
       inject: true
     }),
-    new CopyWebpackPlugin([{
-      from: path.resolve(__dirname, 'static'),
-      to: path.resolve(__dirname, 'dist'),
-      toType: 'dir'
-    }])
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: path.resolve(__dirname, 'static'),
+          to: path.resolve(__dirname, 'dist'),
+          toType: 'dir'
+        }
+      ]
+    })
   ],
 
   optimization: {
@@ -96,7 +100,9 @@ module.exports = (env, argv) => ({
     host: 'localhost',
     https: true,
     open: true,
-    overlay: true,
-    port: 9000
+    port: 9000,
+    client: {
+      overlay: true
+    }
   }
 });
