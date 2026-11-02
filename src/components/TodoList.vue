@@ -1,165 +1,161 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-    <!-- Header -->
-    <header class="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-10">
-      <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-        <div class="flex items-center space-x-4">
-          <h1 class="text-xl font-bold text-gray-900 dark:text-white">Todo List</h1>
-          <span 
-            class="text-sm px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
-          >
-            {{ todos.length }} tasks
+  <div class="space-y-6">
+    <!-- Page Header & Action Bar -->
+    <div class="flex items-center justify-between flex-wrap gap-3">
+      <div>
+        <div class="flex items-center space-x-2.5">
+          <h1 class="text-xl md:text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">Offline Tasks</h1>
+          <span class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200">
+            {{ todos.length }} {{ todos.length === 1 ? 'task' : 'tasks' }}
           </span>
         </div>
-        <div class="flex items-center space-x-2">
-          <!-- Theme Toggle -->
-          <button 
-            @click="toggleTheme"
-            class="btn-icon"
-            aria-label="Toggle theme"
-          >
-            <svg v-if="isDark" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-            </svg>
-            <svg v-else class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.272.272a1 1 0 001.414-1.414l-.272-.272a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.272.272a1 1 0 01-1.414-1.414l.272-.272a1 1 0 011.414 0zM14 11a1 1 0 00-1 1v1a1 1 0 102 0v-1a1 1 0 00-1-1zm-4 1a1 1 0 011-1h1a1 1 0 110 2H9a1 1 0 01-1-1zm-2-4a1 1 0 011-1h1a1 1 0 110 2H7a1 1 0 01-1-1zm1 7a1 1 0 100-2 1 1 0 000 2zm-3-1a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm1-5a1 1 0 100-2 1 1 0 000 2z" />
-            </svg>
-          </button>
-          
-          <!-- Clear All Button -->
-          <button 
-            @click="clearAll"
-            :disabled="todos.length === 0"
-            class="btn-secondary text-sm px-3 py-1.5"
-            :class="{ 'opacity-50 cursor-not-allowed': todos.length === 0 }"
-          >
-            Clear All
-          </button>
-        </div>
+        <p class="text-xs text-gray-600 dark:text-gray-300 mt-0.5 font-normal">
+          Persisted offline in IndexedDB on your device.
+        </p>
       </div>
-    </header>
 
-    <!-- Main Content -->
-    <main class="max-w-4xl mx-auto px-4 py-6">
-      <!-- Add Todo Form -->
-      <div class="card mb-6 fade-in">
-        <form @submit.prevent="addTodo" class="flex space-x-2">
+      <!-- Quick Action Buttons -->
+      <div class="flex items-center space-x-2">
+        <button 
+          v-if="completedCount > 0"
+          @click="clearCompleted"
+          class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 active:scale-95 transition-all"
+        >
+          Clear {{ completedCount }} done
+        </button>
+        <button 
+          v-if="todos.length > 0"
+          @click="clearAll"
+          class="btn-danger text-xs font-semibold px-3 py-1.5"
+        >
+          Clear all
+        </button>
+      </div>
+    </div>
+
+    <!-- Add Task Card Form -->
+    <div class="card p-3 md:p-4 shadow-sm bg-white dark:bg-gray-800">
+      <form @submit.prevent="addTodo" class="flex items-center space-x-2">
+        <div class="relative flex-1">
           <input 
             v-model="newTodo"
             @keyup.enter="addTodo"
+            type="text"
             placeholder="Add a new task..."
-            class="input-field flex-1"
+            class="input-field bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400 border border-gray-200 dark:border-gray-600"
             ref="todoInput"
           />
-          <button 
-            type="submit"
-            :disabled="!newTodo.trim()"
-            class="btn-primary"
-            :class="{ 'opacity-50 cursor-not-allowed': !newTodo.trim() }"
-          >
-            Add
-          </button>
-        </form>
+        </div>
+        <button 
+          type="submit"
+          :disabled="!newTodo.trim()"
+          class="btn-primary flex items-center space-x-1"
+          :class="{ 'opacity-50 cursor-not-allowed': !newTodo.trim() }"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+          </svg>
+          <span class="hidden sm:inline font-bold">Add</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Filter Tabs (if tasks exist) -->
+    <div v-if="todos.length > 0" class="flex items-center justify-between">
+      <div class="flex items-center space-x-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
+        <button 
+          v-for="filter in ['all', 'active', 'completed']" 
+          :key="filter"
+          @click="currentFilter = filter"
+          class="px-3 py-1 rounded-lg text-xs font-semibold capitalize transition-all"
+          :class="currentFilter === filter ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'"
+        >
+          {{ filter }}
+        </button>
       </div>
 
-      <!-- Todo List -->
-      <div class="card" v-if="todos.length > 0">
-        <div class="divide-y divide-gray-200 dark:divide-gray-700">
-          <div 
-            v-for="todo in sortedTodos" 
-            :key="todo.id"
-            class="todo-item slide-up"
-          >
-            <div class="flex items-center space-x-3 flex-1">
-              <input 
-                type="checkbox"
-                v-model="todo.completed"
-                @change="toggleTodo(todo)"
-                :id="`todo-${todo.id}`"
-                class="checkbox"
-              />
-              <label 
-                :for="`todo-${todo.id}`"
-                class="flex-1 cursor-pointer"
-                :class="{
-                  'line-through text-gray-400 dark:text-gray-500': todo.completed,
-                  'text-gray-900 dark:text-gray-100': !todo.completed
-                }"
-              >
-                {{ todo.text }}
-              </label>
-            </div>
+      <div class="text-xs text-gray-500 dark:text-gray-400 font-medium">
+        {{ incompleteCount }} remaining
+      </div>
+    </div>
+
+    <!-- Todo List Card -->
+    <div class="card overflow-hidden bg-white dark:bg-gray-800" v-if="filteredTodos.length > 0">
+      <ul class="divide-y divide-gray-100 dark:divide-gray-700">
+        <li 
+          v-for="todo in filteredTodos" 
+          :key="todo.id"
+          class="p-4 flex items-center justify-between space-x-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group slide-up"
+        >
+          <div class="flex items-center space-x-3.5 flex-1 min-w-0">
+            <!-- Custom Styled Checkbox -->
             <button 
-              @click="deleteTodo(todo.id)"
-              class="btn-icon text-red-500 hover:text-red-700 dark:hover:text-red-400"
-              aria-label="Delete todo"
+              type="button"
+              @click="toggleTodo(todo)"
+              class="w-5 h-5 rounded-lg border flex items-center justify-center transition-all focus:outline-none"
+              :class="todo.completed ? 'bg-blue-600 border-blue-600 text-white' : 'border-gray-300 dark:border-gray-500 hover:border-blue-500 bg-white dark:bg-gray-700'"
+              aria-label="Toggle todo status"
             >
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+              <svg v-if="todo.completed" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
               </svg>
             </button>
-          </div>
-        </div>
-      </div>
 
-      <!-- Empty State -->
-      <div 
-        v-else 
-        class="card text-center py-12 fade-in"
-      >
-        <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <p class="text-gray-500 dark:text-gray-400 text-lg">No tasks yet</p>
-        <p class="text-gray-400 dark:text-gray-500 text-sm mt-1">Add one above to get started</p>
-      </div>
-
-      <!-- Stats -->
-      <div class="card mt-6" v-if="todos.length > 0">
-        <div class="flex items-center justify-between text-sm">
-          <div class="flex items-center space-x-4">
+            <!-- Task Label -->
             <span 
-              class="flex items-center"
-              :class="{
-                'text-green-600 dark:text-green-400': completedCount > 0,
-                'text-gray-400': completedCount === 0
-              }"
+              @click="toggleTodo(todo)"
+              class="text-sm cursor-pointer select-none truncate transition-all"
+              :class="todo.completed ? 'line-through text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-white font-medium'"
             >
-              <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-              </svg>
-              {{ completedCount }} completed
-            </span>
-            <span 
-              class="flex items-center text-gray-500 dark:text-gray-400"
-            >
-              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
-              {{ incompleteCount }} remaining
+              {{ todo.text }}
             </span>
           </div>
+
+          <!-- Delete Button -->
           <button 
-            @click="clearCompleted"
-            :disabled="completedCount === 0"
-            class="text-sm text-blue-600 dark:text-blue-400 hover:underline"
-            :class="{ 'opacity-50 cursor-not-allowed': completedCount === 0 }"
+            @click="deleteTodo(todo.id)"
+            class="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900 active:scale-95 transition-all"
+            aria-label="Delete todo"
           >
-            Clear completed
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
           </button>
-        </div>
-      </div>
-    </main>
+        </li>
+      </ul>
+    </div>
 
-    <!-- Offline Status -->
+    <!-- Empty State -->
+    <div 
+      v-else-if="todos.length === 0" 
+      class="card text-center py-12 px-4 space-y-3 fade-in bg-white dark:bg-gray-800"
+    >
+      <div class="w-14 h-14 mx-auto rounded-2xl bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+        </svg>
+      </div>
+      <h3 class="font-bold text-base text-gray-900 dark:text-white">No tasks on your list</h3>
+      <p class="text-xs text-gray-500 dark:text-gray-300 max-w-xs mx-auto font-normal">
+        Add a task above. It will be saved instantly to your local device database.
+      </p>
+    </div>
+
+    <!-- Empty Filtered State -->
+    <div 
+      v-else 
+      class="card text-center py-8 px-4 text-xs text-gray-400 fade-in bg-white dark:bg-gray-800"
+    >
+      No {{ currentFilter }} tasks found.
+    </div>
+
+    <!-- Offline Notification Banner -->
     <div 
       v-if="!isOnline"
-      class="fixed bottom-4 left-4 right-4 bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 p-3 rounded-lg shadow-lg flex items-center justify-center space-x-2"
+      class="rounded-2xl bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-800 p-3.5 flex items-center space-x-3 text-xs text-yellow-800 dark:text-yellow-200 fade-in shadow-sm"
     >
-      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-      </svg>
-      <span>Offline - Changes will sync when back online</span>
+      <div class="w-2 h-2 rounded-full bg-yellow-500 animate-ping"></div>
+      <span class="font-medium">You are offline. All changes are stored locally in IndexedDB and ready to use.</span>
     </div>
   </div>
 </template>
@@ -168,19 +164,22 @@
 import db from '../utils/db';
 
 export default {
+  name: 'TodoList',
   data: () => ({
     newTodo: '',
     todos: [],
-    isDark: false,
+    currentFilter: 'all',
     isOnline: navigator.onLine
   }),
   computed: {
-    sortedTodos() {
-      return [...this.todos].sort((a, b) => {
-        if (a.completed && !b.completed) return 1;
-        if (!a.completed && b.completed) return -1;
-        return a.id - b.id;
-      });
+    filteredTodos() {
+      if (this.currentFilter === 'active') {
+        return this.todos.filter(t => !t.completed);
+      }
+      if (this.currentFilter === 'completed') {
+        return this.todos.filter(t => t.completed);
+      }
+      return this.todos;
     },
     completedCount() {
       return this.todos.filter(t => t.completed).length;
@@ -190,84 +189,59 @@ export default {
     }
   },
   async created() {
-    // Load theme from localStorage
-    this.isDark = localStorage.getItem('theme') === 'dark' || 
-                  (window.matchMedia('(prefers-color-scheme: dark)').matches && 
-                   !localStorage.getItem('theme'));
-    this.applyTheme();
-    
-    // Load todos from IndexedDB
     await this.loadTodos();
-    
-    // Listen for online/offline events
-    window.addEventListener('online', () => {
-      this.isOnline = true;
-    });
-    window.addEventListener('offline', () => {
-      this.isOnline = false;
-    });
+    window.addEventListener('online', () => { this.isOnline = true; });
+    window.addEventListener('offline', () => { this.isOnline = false; });
   },
   methods: {
-    applyTheme() {
-      if (this.isDark) {
-        document.documentElement.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-        localStorage.setItem('theme', 'light');
-      }
-    },
-    toggleTheme() {
-      this.isDark = !this.isDark;
-      this.applyTheme();
-    },
     async loadTodos() {
       try {
         this.todos = await db.getAllTodos();
       } catch (error) {
-        console.error('Failed to load todos:', error);
-        this.todos = [];
+        console.error('Failed to load todos from IndexedDB:', error);
       }
     },
     async addTodo() {
-      if (!this.newTodo.trim()) return;
-      
+      const text = this.newTodo.trim();
+      if (!text) return;
+
       const todo = {
-        text: this.newTodo.trim(),
+        text,
         completed: false,
-        createdAt: new Date().toISOString()
+        createdAt: new Date()
       };
-      
+
       try {
-        await db.addTodo(todo);
-        this.todos.push(todo);
+        const id = await db.addTodo(todo);
+        this.todos.unshift({ ...todo, id });
         this.newTodo = '';
-        this.$nextTick(() => this.$refs.todoInput.focus());
+        if (this.$refs.todoInput) {
+          this.$refs.todoInput.focus();
+        }
       } catch (error) {
         console.error('Failed to add todo:', error);
       }
     },
     async toggleTodo(todo) {
+      todo.completed = !todo.completed;
       try {
         await db.updateTodo(todo);
       } catch (error) {
         console.error('Failed to update todo:', error);
-        // Revert if failed
-        todo.completed = !todo.completed;
+        todo.completed = !todo.completed; // rollback
       }
     },
     async deleteTodo(id) {
       try {
         await db.deleteTodo(id);
-        this.todos = this.todos.filter(todo => todo.id !== id);
+        this.todos = this.todos.filter(t => t.id !== id);
       } catch (error) {
         console.error('Failed to delete todo:', error);
       }
     },
     async clearAll() {
       if (this.todos.length === 0) return;
-      
-      if (confirm('Are you sure you want to delete all todos?')) {
+      if (confirm('Are you sure you want to delete all tasks?')) {
         try {
           await db.clearAll();
           this.todos = [];
@@ -278,13 +252,11 @@ export default {
     },
     async clearCompleted() {
       const completed = this.todos.filter(t => t.completed);
-      if (completed.length === 0) return;
-      
       try {
         for (const todo of completed) {
           await db.deleteTodo(todo.id);
         }
-        this.todos = this.todos.filter(todo => !todo.completed);
+        this.todos = this.todos.filter(t => !t.completed);
       } catch (error) {
         console.error('Failed to clear completed todos:', error);
       }
@@ -292,7 +264,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-/* Add any component-specific styles here */
-</style>

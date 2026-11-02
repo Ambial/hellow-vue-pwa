@@ -2,14 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Material Design base styles */
 @layer base {
   html {
-    @apply transition-colors duration-300;
+    @apply transition-colors duration-200;
+    -webkit-tap-highlight-color: transparent;
   }
   
   body {
-    @apply min-h-screen bg-gray-50 text-gray-900;
+    @apply min-h-screen bg-gray-50 text-gray-900 antialiased;
   }
   
   .dark body {
@@ -17,121 +17,52 @@
   }
 }
 
-/* Material Design component styles */
 @layer components {
   .btn-primary {
-    @apply bg-blue-600 text-white px-4 py-2 rounded-md 
-           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50
-           transition-colors duration-200 shadow-md;
-  }
-  
-  .btn-primary:hover {
-    @apply bg-blue-700;
+    @apply inline-flex items-center justify-center font-medium bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl
+           focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition-all duration-150;
   }
 
   .btn-secondary {
-    @apply bg-yellow-500 text-white px-4 py-2 rounded-md 
-           focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50
-           transition-colors duration-200 shadow-md;
+    @apply inline-flex items-center justify-center font-medium bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 px-3.5 py-1.5 rounded-xl
+           focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all duration-150;
   }
-  
-  .btn-secondary:hover {
-    @apply bg-yellow-600;
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center font-medium bg-red-50 hover:bg-red-100 dark:bg-red-900 dark:hover:bg-red-800 text-red-600 dark:text-red-200 px-3 py-1.5 rounded-xl
+           focus:outline-none focus:ring-2 focus:ring-red-500 transition-all duration-150;
   }
 
   .btn-icon {
-    @apply p-2 rounded-full transition-colors duration-200 focus:outline-none;
-  }
-  
-  .btn-icon:hover {
-    @apply bg-gray-100;
-  }
-  
-  .dark .btn-icon:hover {
-    @apply bg-gray-700;
+    @apply p-2 rounded-xl text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-150 focus:outline-none;
   }
 
   .card {
-    @apply bg-white rounded-lg shadow-md p-4 transition-shadow duration-200;
-  }
-  
-  .card:hover {
-    @apply shadow-lg;
-  }
-  
-  .dark .card {
-    @apply bg-gray-800;
+    @apply bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200;
   }
 
   .input-field {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-900
-           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-           transition-colors duration-200;
-  }
-  
-  .dark .input-field {
-    @apply bg-gray-700 border-gray-600 text-gray-100;
-  }
-
-  .todo-item {
-    @apply flex items-center p-3 border-b border-gray-200 transition-colors duration-200;
-  }
-  
-  .todo-item:hover {
-    @apply bg-gray-50;
-  }
-  
-  .dark .todo-item {
-    @apply border-gray-700;
-  }
-  
-  .dark .todo-item:hover {
-    @apply bg-gray-700;
-  }
-
-  .checkbox {
-    @apply h-5 w-5 rounded border-2 border-gray-300 text-blue-600
-           focus:ring-blue-500 transition-colors duration-200;
-  }
-  
-  .dark .checkbox {
-    @apply border-gray-600 text-blue-400;
+    @apply w-full px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-400
+           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-150;
   }
 
   .nav-link {
-    @apply px-3 py-2 rounded-md text-gray-700
-           transition-colors duration-200;
-  }
-  
-  .nav-link:hover {
-    @apply bg-gray-100 text-blue-600;
-  }
-  
-  .dark .nav-link {
-    @apply text-gray-300;
-  }
-  
-  .dark .nav-link:hover {
-    @apply bg-gray-700;
+    @apply px-3 py-2 rounded-xl text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800
+           transition-colors duration-150;
   }
 
   .nav-link-active {
-    @apply bg-blue-50 text-blue-600 font-medium;
-  }
-  
-  .dark .nav-link-active {
-    @apply bg-gray-700 text-blue-400;
+    @apply bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-300 font-semibold;
   }
 }
 
-/* Custom animations */
 @layer utilities {
   .fade-in {
-    animation: fadeIn 0.3s ease-in-out;
+    animation: fadeIn 0.25s ease-out;
   }
 
   .slide-up {
-    animation: slideUp 0.3s ease-out;
+    animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   @keyframes fadeIn {
@@ -142,16 +73,11 @@
   @keyframes slideUp {
     from { 
       opacity: 0;
-      transform: translateY(10px);
+      transform: translateY(8px);
     }
     to { 
       opacity: 1;
       transform: translateY(0);
     }
-  }
-  
-  /* Fix for last todo item border */
-  .todo-item:last-child {
-    border-bottom: none;
   }
 }

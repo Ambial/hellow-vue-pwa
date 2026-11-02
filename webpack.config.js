@@ -56,7 +56,7 @@ module.exports = (env, argv) => ({
     new CleanWebpackPlugin(),
     new VueLoaderPlugin(),
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, 'static', 'index.html'),
+      template: path.resolve(__dirname, 'src', 'index.html'),
       inject: true
     }),
     new CopyWebpackPlugin({
@@ -111,12 +111,16 @@ module.exports = (env, argv) => ({
         publicPath: '/'
       }
     ],
+    historyApiFallback: true,
     compress: true,
     host: '0.0.0.0',
     allowedHosts: 'all',
     port: 9000,
+    hot: true,
+    liveReload: false,
     client: {
-      overlay: true
+      overlay: true,
+      webSocketURL: 'auto://0.0.0.0:0/ws'
     }
   }
 });

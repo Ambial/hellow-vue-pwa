@@ -1,13 +1,15 @@
 // Service Worker for Hello Vue PWA
 // Cache version - update this when you change assets
-const CACHE_VERSION = 'v1.1';
+const CACHE_VERSION = 'v2.0';
 const CACHE_NAME = `hello-vue-pwa-${CACHE_VERSION}`;
 
-// Files to cache for offline use
+// Critical assets to pre-cache on install
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
   '/main.js',
+  '/vendors~main.js',
+  '/runtime~main.js',
   '/manifest.webmanifest',
   '/icons/icon-72x72.png',
   '/icons/icon-96x96.png',
@@ -22,65 +24,51 @@ const ASSETS_TO_CACHE = [
   '/icons/favicon-16x16.png'
 ];
 
-// Optional chunks that may vary between dev and production
-const OPTIONAL_ASSETS = [
-  '/vendors~main.js',
-  '/runtime~main.js'
-];
-
 // Install service worker and cache assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(async (cache) => {
-        console.log('Service Worker: Caching critical assets');
-        
-        // Cache assets resiliently so a missing optional chunk doesn't break installation
-        const cachePromises = ASSETS_TO_CACHE.concat(OPTIONAL_ASSETS).map(async (url) => {
+        console.log('Service Worker: Pre-caching critical assets');
+        const promises = ASSETS_TO_CACHE.map(async (url) => {
           try {
             const response = await fetch(url);
             if (response.ok) {
               await cache.put(url, response);
             }
           } catch (err) {
-            // Non-critical if optional assets fail in some dev configurations
-            console.warn(`Service Worker: Skipped caching ${url}:`, err.message);
+            console.warn(`Service Worker: Skipped ${url}:`, err.message);
           }
         });
-
-        await Promise.all(cachePromises);
+        await Promise.all(promises);
         console.log('Service Worker: Assets cached successfully');
       })
       .then(() => self.skipWaiting())
-      .catch((error) => {
-        console.error('Service Worker: Failed to cache assets:', error);
-      })
   );
 });
 
-// Activate service worker and clean up old caches
+// Activate service worker and purge older caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME) {
-            console.log('Service Worker: Deleting old cache:', cacheName);
+            console.log('Service Worker: Purging outdated cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
     })
     .then(() => {
-      console.log('Service Worker: Activated');
-      return self.clients.claim(); // Take control of all clients
+      console.log('Service Worker: Activated and controlling clients');
+      return self.clients.claim();
     })
   );
 });
 
-// Fetch assets from cache or network
+// Fetch assets with Network-First strategy for HTML & JS, Cache-First for static icons
 self.addEventListener('fetch', (event) => {
-  // Only handle HTTP/HTTPS GET requests, skip Webpack HMR and API requests
   if (
     event.request.method !== 'GET' || 
     !event.request.url.startsWith('http') ||
@@ -91,6 +79,23 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Network-First for HTML navigation and JS code bundles (so updates are immediate)
+  if (event.request.mode === 'navigate' || event.request.url.endsWith('.js') || event.request.url.endsWith('.json')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200 && response.type === 'basic') {
+            const responseClone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone)).catch(() => {});
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Cache-First for static assets (images, icons, fonts)
   event.respondWith(
     caches.match(event.request)
       .then((cachedResponse) => {
@@ -115,7 +120,7 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// Listen for messages from clients (e.g. skipWaiting)
+// Listen for messages from client (e.g. SKIP_WAITING)
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
