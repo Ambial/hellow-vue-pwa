@@ -101,10 +101,19 @@ module.exports = (env, argv) => ({
   },
 
   devServer: {
+    static: [
+      {
+        directory: path.resolve(__dirname, 'static'),
+        publicPath: '/'
+      },
+      {
+        directory: path.resolve(__dirname, 'src'),
+        publicPath: '/'
+      }
+    ],
     compress: true,
-    host: 'localhost',
-    https: true,
-    open: true,
+    host: '0.0.0.0',
+    allowedHosts: 'all',
     port: 9000,
     client: {
       overlay: true

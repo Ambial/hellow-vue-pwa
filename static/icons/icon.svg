@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="30%" stop-color="#2563eb"/>
+      <stop offset="70%" stop-color="#1d4ed8"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="vueGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#42d392"/>
+      <stop offset="100%" stop-color="#35a16d"/>
+    </linearGradient>
+    <linearGradient id="vueDark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38495f"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#050e1d" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <!-- Maskable-safe rounded squircle background -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)"/>
+  
+  <!-- Subtle inner border -->
+  <rect x="6" y="6" width="500" height="500" rx="106" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="3"/>
+
+  <!-- Subtle glow aura -->
+  <circle cx="256" cy="210" r="130" fill="#42d392" opacity="0.12"/>
+
+  <!-- Centered Official Vue Logo -->
+  <g transform="translate(128, 95) scale(1.0)" filter="url(#shadow)">
+    <!-- Outer Green V -->
+    <path d="M0,0 L128,220.8 L256,0 L204.8,0 L128,132.48 L50.56,0 Z" fill="url(#vueGreen)"/>
+    <!-- Inner Dark Slate V -->
+    <path d="M50.56,0 L128,133.12 L204.8,0 L157.44,0 L128,51.2 L97.92,0 Z" fill="url(#vueDark)"/>
+  </g>
+
+  <!-- PWA Badge Pill at bottom -->
+  <g transform="translate(256, 395)">
+    <rect x="-85" y="-23" width="170" height="46" rx="23" fill="#ffffff" filter="url(#shadow)"/>
+    <text x="0" y="8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" 
+          font-size="22" font-weight="900" fill="#1d4ed8" text-anchor="middle" letter-spacing="4">PWA</text>
+  </g>
+</svg>

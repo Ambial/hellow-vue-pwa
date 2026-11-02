@@ -19,6 +19,11 @@
   <meta name="msapplication-TileColor" content="#4a6fa5" />
   <meta name="msapplication-tap-highlight" content="no" />
   
+  <!-- Icons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+  
   <!-- Web App Manifest -->
   <link rel="manifest" href="/manifest.webmanifest" />
   
@@ -41,38 +46,31 @@
       });
     }
     
-    // Install prompt for PWA
-    let deferredPrompt;
+    // Install prompt handler for PWA
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
-      deferredPrompt = e;
-      console.log('PWA install prompt available - you can add a button to trigger showInstallPrompt()');
-      
-      // Auto-show install prompt (for demo purposes)
-      setTimeout(() => {
-        if (deferredPrompt) {
-          deferredPrompt.prompt();
-          deferredPrompt.userChoice.then((choiceResult) => {
-            console.log('Install prompt result:', choiceResult.outcome);
-            deferredPrompt = null;
-          });
-        }
-      }, 3000);
+      window.deferredPrompt = e;
+      window.dispatchEvent(new CustomEvent('pwa-installable'));
+      console.log('PWA install prompt available - user can trigger install');
+    });
+
+    window.addEventListener('appinstalled', () => {
+      window.deferredPrompt = null;
+      window.dispatchEvent(new CustomEvent('pwa-installed'));
+      console.log('PWA was installed successfully');
     });
     
-    // Call this function from a button click to show install prompt
-    window.showInstallPrompt = function() {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
-          if (choiceResult.outcome === 'accepted') {
-            console.log('User accepted the install prompt');
-          } else {
-            console.log('User dismissed the install prompt');
-          }
-          deferredPrompt = null;
-        });
+    // Call this function from a button click or user gesture to show install prompt
+    window.showInstallPrompt = async function() {
+      const promptEvent = window.deferredPrompt;
+      if (!promptEvent) {
+        return false;
       }
+      promptEvent.prompt();
+      const choiceResult = await promptEvent.userChoice;
+      console.log('Install prompt result:', choiceResult.outcome);
+      window.deferredPrompt = null;
+      return choiceResult.outcome === 'accepted';
     };
   </script>
 </body>
