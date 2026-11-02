@@ -64,6 +64,10 @@ module.exports = (env, argv) => ({
           from: path.resolve(__dirname, 'static'),
           to: path.resolve(__dirname, 'dist'),
           toType: 'dir'
+        },
+        {
+          from: path.resolve(__dirname, 'src', 'service-worker.js'),
+          to: path.resolve(__dirname, 'dist', 'service-worker.js')
         }
       ]
     })

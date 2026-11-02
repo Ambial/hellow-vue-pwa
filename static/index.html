@@ -3,11 +3,77 @@
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover" />
+  
+  <!-- PWA Meta Tags -->
+  <meta name="description" content="First PWA Vue.js App" />
+  <meta name="theme-color" content="#4a6fa5" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  
+  <!-- iOS App Name -->
+  <meta name="apple-mobile-web-app-title" content="Hello Vue PWA" />
+  
+  <!-- Microsoft Tiles -->
+  <meta name="msapplication-TileColor" content="#4a6fa5" />
+  <meta name="msapplication-tap-highlight" content="no" />
+  
+  <!-- Web App Manifest -->
+  <link rel="manifest" href="/manifest.webmanifest" />
+  
   <title>Hello PWA!</title>
-  <meta name="Description" content="First PWA Vue.js App">
 </head>
 <body>
   <div id="app"></div>
+  
+  <!-- Register Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then((registration) => {
+            console.log('ServiceWorker registration successful');
+          })
+          .catch((error) => {
+            console.error('ServiceWorker registration failed:', error);
+          });
+      });
+    }
+    
+    // Install prompt for PWA
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      console.log('PWA install prompt available - you can add a button to trigger showInstallPrompt()');
+      
+      // Auto-show install prompt (for demo purposes)
+      setTimeout(() => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((choiceResult) => {
+            console.log('Install prompt result:', choiceResult.outcome);
+            deferredPrompt = null;
+          });
+        }
+      }, 3000);
+    });
+    
+    // Call this function from a button click to show install prompt
+    window.showInstallPrompt = function() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted the install prompt');
+          } else {
+            console.log('User dismissed the install prompt');
+          }
+          deferredPrompt = null;
+        });
+      }
+    };
+  </script>
 </body>
 </html>
