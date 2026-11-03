@@ -1,10 +1,10 @@
 module.exports = {
   darkMode: 'class',
   purge: {
-    enabled: false, // keep during dev so all classes are available
+    enabled: true,
     content: [
-      './static/**/*.html',
-      './src/**/*.{vue,js}'
+      './static/**/*.{html,vue}',
+      './src/**/*.{html,vue,js}'
     ]
   },
   theme: {
